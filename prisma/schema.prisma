@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String   @unique
+  password      String
+  trainingPlans Plan[]
+}
+
+model Plan {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String   @unique
+  description String?
+  trainee     User     @relation(references: [id], fields: [traineeId], onDelete: Cascade)
+  traineeId   String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  phases      Phase[]
+}
+
+model Phase {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String     @unique
+  description String?
+  exercises   Exercise[]
+  plan        Plan       @relation(references: [id], fields: [planId], onDelete: Cascade)
+  planId      String     @db.ObjectId
+}
+
+model Exercise {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  name         String         @unique
+  description  String?
+  exerciseData ExerciseData[]
+  phase        Phase          @relation(references: [id], fields: [phaseId], onDelete: Cascade)
+  phaseId      String         @db.ObjectId
+}
+
+model ExerciseData {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  reps       Int
+  sets       Int
+  rest       Int
+  weight     Int
+  exercise   Exercise @relation(references: [id], fields: [exerciseId], onDelete: Cascade)
+  exerciseId String   @db.ObjectId
+}
