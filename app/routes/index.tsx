@@ -1,12 +1,10 @@
 import { type LoaderFunction, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import Navbar from "components/Navbar";
+import { Link, useLoaderData } from "@remix-run/react";
+import Layout from "components/Layout";
 import { getUser } from "server/user.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUser(request);
-
-  console.log(user);
 
   if (!user) return redirect("auth/login");
 
@@ -19,13 +17,10 @@ export default function Index() {
   if (!user) return null;
 
   return (
-    <>
-      <Navbar user={user} />
-      <div className="h-full bg-slate-700 flex justify-center items-center">
-        <h2 className="text-blue-600 font-extrabold text-5xl">
-          TailwindCSS Is Working!
-        </h2>
-      </div>
-    </>
+    <Layout user={user}>
+      <Link to="/plan/add-plan" className="btn btn-sm">
+        Create phase
+      </Link>
+    </Layout>
   );
 }
