@@ -34,5 +34,5 @@ export type ExerciseSuggestion = {
 };
 
 export type SearchPayload = {
-  suggestions: ExerciseSuggestion[];
+  suggestions?: ExerciseSuggestion[];
 };

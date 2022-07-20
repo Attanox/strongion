@@ -1,11 +1,8 @@
 import type { ExercisesPayload, SearchPayload } from "types/exercise";
 
-const EXERCISE_URL = process.env.EXERCISES_URL!;
-const SEARCH_URL = process.env.SEARCH_EXERCISE_URL!;
+const EXERCISE_URL = "https://wger.de/api/v2/exercise/?language=2"
+const SEARCH_URL = "https://wger.de/api/v2/exercise/search/?language=2&term="
 
-if (!EXERCISE_URL || !SEARCH_URL) {
-  throw new Error("no exercise URL defined in .env");
-}
 
 async function get<T>(url: string, customConfig = {}): Promise<T> {
   if (!url) {

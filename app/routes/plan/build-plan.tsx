@@ -1,14 +1,11 @@
-import * as React from "react";
-
 import type { LoaderFunction } from "@remix-run/node";
 import { authenticateUser } from "auth/authenticateUser";
 import { useLoaderData } from "@remix-run/react";
-import { fetchExercises, searchExercises } from "utils/fetch";
+import AutoComplete from "components/AutoComplete.client";
+import { ClientOnly } from "remix-utils";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
-  fetchedExercises: Awaited<ReturnType<typeof fetchExercises>>;
-  searchedExercises: Awaited<ReturnType<typeof searchExercises>>;
 };
 
 export const loader: LoaderFunction = async ({
@@ -16,21 +13,23 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   const user = await authenticateUser(request);
 
-  const fetchedExercises = await fetchExercises();
-  const searchedExercises = await searchExercises("bench");
-
-  return { user, fetchedExercises, searchedExercises };
+  return { user };
 };
 
 const BuildPlan = () => {
-  const { user, fetchedExercises, searchedExercises } =
-    useLoaderData<LoaderData>();
-
-  console.log({ fetchedExercises, searchedExercises });
+  const { user } = useLoaderData<LoaderData>();
 
   if (!user) return null;
 
-  return <div>BuildPlan</div>;
+  return (
+    <div className="flex flex-col px-4">
+      <h1>BuildPlan</h1>
+      <div className="h-4" />
+      <ClientOnly fallback={<div>Loading...</div>}>
+        {() => <AutoComplete />}
+      </ClientOnly>
+    </div>
+  );
 };
 
 export default BuildPlan;
