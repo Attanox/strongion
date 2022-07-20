@@ -4,13 +4,13 @@ import {
   type ActionFunction,
   json,
 } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { getUser } from "server/user.server";
 import Layout from "components/Layout";
 import { createPlan } from "server/plan.server";
 import { createPhase } from "server/phase.server";
-import { ErrorData } from "types/index.server";
+import type { ErrorData } from "types/index.server";
+import { authenticateUser } from "auth/authenticateUser";
 
 const Input = (props: { label: string; name: string; required?: boolean }) => {
   const { required = false } = props;
@@ -32,9 +32,7 @@ const Input = (props: { label: string; name: string; required?: boolean }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getUser(request);
-
-  if (!user) return redirect("auth/login");
+  const user = await authenticateUser(request);
 
   return user;
 };

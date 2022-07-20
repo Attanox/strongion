@@ -1,18 +1,16 @@
-import { type LoaderFunction, redirect } from "@remix-run/node";
+import { type LoaderFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { authenticateUser } from "auth/authenticateUser";
 import Layout from "components/Layout";
-import { getUser } from "server/user.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getUser(request);
-
-  if (!user) return redirect("auth/login");
+  const user = await authenticateUser(request);
 
   return user;
 };
 
 export default function Index() {
-  const user = useLoaderData<Awaited<ReturnType<typeof getUser>>>();
+  const user = useLoaderData<Awaited<ReturnType<typeof authenticateUser>>>();
 
   if (!user) return null;
 
