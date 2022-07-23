@@ -1,8 +1,7 @@
 import type { ExercisesPayload, SearchPayload } from "types/exercise";
 
-const EXERCISE_URL = "https://wger.de/api/v2/exercise/?language=2"
-const SEARCH_URL = "https://wger.de/api/v2/exercise/search/?language=2&term="
-
+const EXERCISE_URL = "https://wger.de/api/v2/exercise/?language=2";
+const SEARCH_URL = "https://wger.de/api/v2/exercise/search/?language=2&term=";
 
 async function get<T>(url: string, customConfig = {}): Promise<T> {
   if (!url) {
@@ -13,14 +12,18 @@ async function get<T>(url: string, customConfig = {}): Promise<T> {
     ...customConfig,
   };
 
-  return fetch(url, config).then(async (response) => {
-    if (response.ok) {
-      return await response.json();
-    } else {
-      const errorMessage = await response.text();
-      return Promise.reject(new Error(errorMessage));
-    }
-  });
+  return fetch(url, config)
+    .then(async (response) => {
+      if (response.ok) {
+        return await response.json();
+      } else {
+        const errorMessage = await response.text();
+        return Promise.reject(new Error(errorMessage));
+      }
+    })
+    .catch(function (err) {
+      console.error(` Err: ${err}`);
+    });
 }
 
 export function fetchExercises() {
