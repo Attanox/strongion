@@ -31,6 +31,10 @@ export type ExerciseSuggestion = {
     image: string | null;
     image_thumbnail: string | null;
   };
+  info: {
+    sets: number;
+    reps: number;
+  };
 };
 
 export type SearchPayload = {

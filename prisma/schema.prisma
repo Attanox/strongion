@@ -40,20 +40,17 @@ model Phase {
 }
 
 model Exercise {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  name         String         @unique
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
   description  String?
-  exerciseData ExerciseData[]
-  phase        Phase          @relation(references: [id], fields: [phaseId], onDelete: Cascade)
-  phaseId      String         @db.ObjectId
+  exerciseData ExerciseData
+  phase        Phase        @relation(references: [id], fields: [phaseId], onDelete: Cascade)
+  phaseId      String       @db.ObjectId
 }
 
-model ExerciseData {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  reps       Int
-  sets       Int
-  rest       Int
-  weight     Int
-  exercise   Exercise @relation(references: [id], fields: [exerciseId], onDelete: Cascade)
-  exerciseId String   @db.ObjectId
+type ExerciseData {
+  reps   Int
+  sets   Int
+  rest   Int
+  weight Int?
 }

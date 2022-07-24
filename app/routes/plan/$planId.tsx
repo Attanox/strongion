@@ -1,11 +1,16 @@
 import React from "react";
-import { useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { authenticateUser } from "auth/authenticateUser";
-import { type LoaderFunction, redirect } from "@remix-run/node";
+import {
+  type LoaderFunction,
+  redirect,
+  type ActionFunction,
+} from "@remix-run/node";
 import Layout from "components/Layout";
 import { getPlanAndPhases } from "server/plan.server";
 import { ClientOnly } from "remix-utils";
 import DragEditor from "components/DragEditor.client";
+import qs from "qs";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
@@ -13,11 +18,17 @@ type LoaderData = {
   phases: Awaited<ReturnType<typeof getPlanAndPhases>>["phases"];
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const text = await request.text();
+  return qs.parse(text);
+};
+
 export const loader: LoaderFunction = async ({
   request,
   params,
 }): Promise<LoaderData> => {
   const user = await authenticateUser(request);
+
   const { planId } = params;
 
   if (!planId) throw redirect("/");
@@ -31,9 +42,9 @@ export const loader: LoaderFunction = async ({
 
 const PlanEditor = () => {
   const { user, plan, phases } = useLoaderData<LoaderData>();
+  const data = useActionData();
 
-  console.log("plan", plan);
-  console.log("phases", phases);
+  console.log("data", data);
 
   if (!user || !plan) return null;
 
