@@ -11,6 +11,7 @@ import { getPlanAndPhases } from "server/plan.server";
 import { ClientOnly } from "remix-utils";
 import DragEditor from "components/DragEditor.client";
 import qs from "qs";
+import { addExercisesToPhase, getPhasesByPlan } from "server/phase.server";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
@@ -18,9 +19,33 @@ type LoaderData = {
   phases: Awaited<ReturnType<typeof getPlanAndPhases>>["phases"];
 };
 
-export const action: ActionFunction = async ({ request }) => {
+type TPhaseData = { [id: string]: {title: string, sets: string, reps: string} }
+
+export const action: ActionFunction = async ({ request, params }) => {
+  const { planId } = params;
+
+  if (!planId) return null;
+
   const text = await request.text();
-  return qs.parse(text);
+  const parsed = qs.parse(text) as { phase: TPhaseData[] };
+
+  const phases = await getPhasesByPlan(planId);
+
+  for (let index = 0; index < phases.length; index++) {
+    const phase = phases[index];
+    const phaseData = parsed.phase[index];
+
+    const data = Object.values(phaseData).map((d) => ({
+      name: d.title,
+      exerciseData: { reps: Number(d.reps), sets: Number(d.sets) },
+      phaseId: phase.id,
+    }));
+
+    const result = await addExercisesToPhase(data);
+    console.log(result);
+  }
+
+  return parsed;
 };
 
 export const loader: LoaderFunction = async ({

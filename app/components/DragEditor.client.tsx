@@ -59,23 +59,18 @@ const move = (
 
 const grid = 8;
 
-const getListStyle = (isDraggingOver: boolean) => ({
-  background: isDraggingOver ? "lightblue" : "lightgrey",
+const getListStyle = () => ({
   padding: grid,
   width: 250,
 });
 
 const getItemStyle = (
-  isDragging: boolean,
   draggableStyle: DraggingStyle | NotDraggingStyle | undefined
 ): React.CSSProperties => ({
   // some basic styles to make the items look a bit nicer
   userSelect: "none",
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
-
-  // change background colour if dragging
-  background: isDragging ? "lightgreen" : "grey",
 
   // styles we need to apply on draggables
   ...draggableStyle,
@@ -205,7 +200,8 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      style={getListStyle(snapshot.isDraggingOver)}
+                      style={getListStyle()}
+                      className={`bg-primary`}
                     >
                       {phase.map((exercise, index) => (
                         <Draggable
@@ -220,10 +216,9 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 style={getItemStyle(
-                                  snapshot.isDragging,
                                   provided.draggableProps.style
                                 )}
-                                className="w-full flex flex-col justify-center items-start"
+                                className={`w-full flex flex-col justify-center items-start bg-base-100`}
                                 key={`${exercise.info.sets}-${exercise.info.reps}`}
                               >
                                 <span>{exercise.value}</span>
@@ -283,7 +278,8 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  style={getListStyle(snapshot.isDraggingOver)}
+                  style={getListStyle()}
+                  className={`bg-primary`}
                 >
                   {searchedExercises.map((exercise, index) => (
                     <Draggable
@@ -296,11 +292,8 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style
-                          )}
-                          className="w-full flex flex-col justify-center items-start"
+                          style={getItemStyle(provided.draggableProps.style)}
+                          className={`w-full flex flex-col justify-center items-start bg-base-100`}
                         >
                           <span>{exercise.value}</span>
                           <div className="flex items-center">
