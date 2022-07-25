@@ -28,11 +28,27 @@ export async function getPlanAndPhases(id: string) {
     },
   });
 
-  const phases = await prisma.phase.findMany({
+  const dbPhases = await prisma.phase.findMany({
     where: {
       planId: id,
     },
   });
+
+  const phases = [];
+
+  for (let index = 0; index < dbPhases.length; index++) {
+    const phase = dbPhases[index];
+
+    const exercises = await prisma.phase
+      .findFirst({
+        where: {
+          id: phase.id,
+        },
+      })
+      .exercises();
+
+    phases.push({ ...phase, exercises });
+  }
 
   return { plan, phases };
 }

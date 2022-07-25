@@ -1,5 +1,5 @@
 import React from "react";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { authenticateUser } from "auth/authenticateUser";
 import {
   type LoaderFunction,
@@ -19,7 +19,9 @@ type LoaderData = {
   phases: Awaited<ReturnType<typeof getPlanAndPhases>>["phases"];
 };
 
-type TPhaseData = { [id: string]: {title: string, sets: string, reps: string} }
+type TPhaseData = {
+  [id: string]: { title: string; sets: string; reps: string };
+};
 
 export const action: ActionFunction = async ({ request, params }) => {
   const { planId } = params;
@@ -41,11 +43,13 @@ export const action: ActionFunction = async ({ request, params }) => {
       phaseId: phase.id,
     }));
 
-    const result = await addExercisesToPhase(data);
-    console.log(result);
+    await addExercisesToPhase(data);
   }
 
-  return parsed;
+  return redirect("/", {
+    status: 200,
+    statusText: `All exercises have been saved to plan ${planId}`,
+  });
 };
 
 export const loader: LoaderFunction = async ({
@@ -67,9 +71,6 @@ export const loader: LoaderFunction = async ({
 
 const PlanEditor = () => {
   const { user, plan, phases } = useLoaderData<LoaderData>();
-  const data = useActionData();
-
-  console.log("data", data);
 
   if (!user || !plan) return null;
 

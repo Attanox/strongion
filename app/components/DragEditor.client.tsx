@@ -1,5 +1,5 @@
 import React from "react";
-import type { Phase, Plan } from "@prisma/client";
+import type { Plan } from "@prisma/client";
 import {
   DragDropContext,
   Draggable,
@@ -10,24 +10,37 @@ import {
   type ResponderProvided,
   type DraggableLocation,
 } from "react-beautiful-dnd";
-import type { ExerciseSuggestion } from "types/exercise";
 import AutoComplete from "./AutoComplete.client";
 import { Form } from "@remix-run/react";
+import { type getPlanAndPhases } from "server/plan.server";
 
-const getItems = (phases: number) => {
+type TPhases = Awaited<ReturnType<typeof getPlanAndPhases>>["phases"];
+
+type DndExercise = {
+  name: string;
+  id: string;
+  info: {
+    reps: number;
+    sets: number;
+  };
+};
+
+const getItems = (phases: TPhases) => {
   const result = [];
-  for (let index = 0; index < phases; index++) {
-    result.push([]);
+  for (let index = 0; index < phases.length; index++) {
+    const phase = phases[index];
+    const exercises = phase.exercises.map((el) => ({
+      name: el.name,
+      id: el.id,
+      info: { reps: el.exerciseData.reps, sets: el.exerciseData.sets },
+    }));
+    result.push([...exercises]);
   }
   return result;
 };
 
 // a little function to help us with reordering the result
-const reorder = (
-  list: ExerciseSuggestion[],
-  startIndex: number,
-  endIndex: number
-) => {
+const reorder = (list: DndExercise[], startIndex: number, endIndex: number) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -39,8 +52,8 @@ const reorder = (
  * Moves an item from one list to another list.
  */
 const move = (
-  source: ExerciseSuggestion[],
-  destination: ExerciseSuggestion[],
+  source: DndExercise[],
+  destination: DndExercise[],
   droppableSource: DraggableLocation,
   droppableDestination: DraggableLocation
 ) => {
@@ -50,7 +63,7 @@ const move = (
 
   destClone.splice(droppableDestination.index, 0, removed);
 
-  const result: { [k: string]: ExerciseSuggestion[] } = {};
+  const result: { [k: string]: DndExercise[] } = {};
   result[droppableSource.droppableId] = sourceClone;
   result[droppableDestination.droppableId] = destClone;
 
@@ -76,15 +89,15 @@ const getItemStyle = (
   ...draggableStyle,
 });
 
-const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
+const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
   const { phases: initialPhases } = props;
 
-  const [phases, setPhases] = React.useState<ExerciseSuggestion[][]>(
-    getItems(initialPhases.length)
+  const [phases, setPhases] = React.useState<DndExercise[][]>(
+    getItems(initialPhases)
   );
 
   const [searchedExercises, setSearchedExercises] = React.useState<
-    ExerciseSuggestion[]
+    DndExercise[]
   >([]);
 
   const changeSetsAndReps = (
@@ -181,7 +194,13 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
         <div className="flex w-full items-center justify-between">
           <AutoComplete
             setSearchedExercises={(e) => {
-              const newlyAdded = [{ ...e[0], info: { sets: 0, reps: 0 } }];
+              const newlyAdded: DndExercise[] = [
+                {
+                  name: e[0].value,
+                  id: String(e[0].data.id),
+                  info: { sets: 0, reps: 0 },
+                },
+              ];
               setSearchedExercises((prevStat) => [...prevStat, ...newlyAdded]);
             }}
           />
@@ -205,8 +224,8 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                     >
                       {phase.map((exercise, index) => (
                         <Draggable
-                          key={exercise.data.id}
-                          draggableId={String(exercise.data.id)}
+                          key={exercise.id}
+                          draggableId={exercise.id}
                           index={index}
                         >
                           {(provided, snapshot) => {
@@ -221,15 +240,15 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                                 className={`w-full flex flex-col justify-center items-start bg-base-100`}
                                 key={`${exercise.info.sets}-${exercise.info.reps}`}
                               >
-                                <span>{exercise.value}</span>
+                                <span>{exercise.name}</span>
                                 <input
-                                  name={`phase[${idx}][${exercise.data.id}][title]`}
-                                  defaultValue={exercise.value}
+                                  name={`phase[${idx}][${exercise.id}][title]`}
+                                  defaultValue={exercise.name}
                                   className="hidden"
                                 />
                                 <div className="flex items-center">
                                   <input
-                                    name={`phase[${idx}][${exercise.data.id}][sets]`}
+                                    name={`phase[${idx}][${exercise.id}][sets]`}
                                     type="number"
                                     defaultValue={exercise.info.sets}
                                     onChange={(e) => {
@@ -246,7 +265,7 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                                   />
                                   <span className="mx-4">X</span>
                                   <input
-                                    name={`phase[${idx}][${exercise.data.id}][reps]`}
+                                    name={`phase[${idx}][${exercise.id}][reps]`}
                                     type="number"
                                     defaultValue={exercise.info.reps}
                                     onChange={(e) => {
@@ -283,8 +302,8 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                 >
                   {searchedExercises.map((exercise, index) => (
                     <Draggable
-                      key={exercise.data.id}
-                      draggableId={String(exercise.data.id)}
+                      key={exercise.id}
+                      draggableId={exercise.id}
                       index={index}
                     >
                       {(provided, snapshot) => (
@@ -295,7 +314,7 @@ const DragEditor = (props: { plan: Plan; phases: Phase[] }) => {
                           style={getItemStyle(provided.draggableProps.style)}
                           className={`w-full flex flex-col justify-center items-start bg-base-100`}
                         >
-                          <span>{exercise.value}</span>
+                          <span>{exercise.name}</span>
                           <div className="flex items-center">
                             <input
                               name="sets"
