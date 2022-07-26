@@ -1,5 +1,5 @@
 import React from "react";
-import { useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { authenticateUser } from "auth/authenticateUser";
 import {
   type LoaderFunction,
@@ -11,7 +11,11 @@ import { getPlanAndPhases } from "server/plan.server";
 import { ClientOnly } from "remix-utils";
 import DragEditor from "components/DragEditor.client";
 import qs from "qs";
-import { addExercisesToPhase, getPhasesByPlan } from "server/phase.server";
+import {
+  addExercisesToPhase,
+  getPhasesByPlan,
+  removePhaseExercises,
+} from "server/phase.server";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
@@ -43,13 +47,12 @@ export const action: ActionFunction = async ({ request, params }) => {
       phaseId: phase.id,
     }));
 
+    // * remove all, then add them back
+    await removePhaseExercises(phase.id);
     await addExercisesToPhase(data);
   }
 
-  return redirect("/", {
-    status: 200,
-    statusText: `All exercises have been saved to plan ${planId}`,
-  });
+  return redirect("/");
 };
 
 export const loader: LoaderFunction = async ({

@@ -188,6 +188,22 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
     }
   };
 
+  const removeExercise = (phaseIdx: number, exerciseIdx: number) => {
+    const newPhases = [...phases];
+
+    newPhases[phaseIdx].splice(exerciseIdx, 1);
+
+    setPhases(newPhases);
+  };
+
+  const removeSearched = (exerciseIdx: number) => {
+    const newSearched = [...searchedExercises];
+
+    newSearched.splice(exerciseIdx, 1);
+
+    setSearchedExercises(newSearched);
+  };
+
   return (
     <Form method="post">
       <div className="w-full flex flex-col">
@@ -240,7 +256,29 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
                                 className={`w-full flex flex-col justify-center items-start bg-base-100`}
                                 key={`${exercise.info.sets}-${exercise.info.reps}`}
                               >
-                                <span>{exercise.name}</span>
+                                <div className="w-full flex justify-between items-center">
+                                  <span>{exercise.name}</span>
+                                  <button
+                                    onClick={() => removeExercise(idx, index)}
+                                    className="btn btn-square btn-sm btn-outline fill-primary"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-3 w-3"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                                <div className="h-4" />
                                 <input
                                   name={`phase[${idx}][${exercise.id}][title]`}
                                   defaultValue={exercise.name}
@@ -314,7 +352,29 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
                           style={getItemStyle(provided.draggableProps.style)}
                           className={`w-full flex flex-col justify-center items-start bg-base-100`}
                         >
-                          <span>{exercise.name}</span>
+                          <div className="w-full flex justify-between items-center">
+                            <span>{exercise.name}</span>
+                            <button
+                              onClick={() => removeSearched(index)}
+                              className="btn btn-square btn-sm btn-outline fill-primary"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3 w-3"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="h-4" />
                           <div className="flex items-center">
                             <input
                               name="sets"

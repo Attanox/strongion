@@ -44,3 +44,12 @@ export async function addExercisesToPhase(
 
   return exercises;
 }
+
+export async function removePhaseExercises(phaseId: string) {
+  const deleted = await prisma.exercise.deleteMany({
+    where: {
+      phaseId,
+    },
+  });
+  return deleted;
+}
