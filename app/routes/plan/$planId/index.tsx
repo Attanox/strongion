@@ -1,5 +1,5 @@
 import React from "react";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { authenticateUser } from "auth/authenticateUser";
 import {
   type LoaderFunction,
@@ -16,6 +16,7 @@ import {
   getPhasesByPlan,
   removePhaseExercises,
 } from "server/phase.server";
+import PhaseOverview from "components/PhaseOverview";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
@@ -79,9 +80,14 @@ const PlanEditor = () => {
 
   return (
     <Layout user={user}>
-      <ClientOnly fallback={<div>Loading...</div>}>
-        {() => <DragEditor plan={plan} phases={phases} />}
-      </ClientOnly>
+      {phases.map((phase) => {
+        return (
+          <React.Fragment key={phase.id}>
+            <PhaseOverview phase={phase} />
+            <div className="w-full h-8" />
+          </React.Fragment>
+        );
+      })}
     </Layout>
   );
 };

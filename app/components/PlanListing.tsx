@@ -11,9 +11,18 @@ const PlanListing = (props: { plans: Plan[] }) => {
             <div className="card-body">
               <h2 className="card-title">{p.title}</h2>
               <p>{p.description}</p>
-              <Link to={`/plan/${p.id}`} className="card-actions justify-end">
-                <button className="btn">Edit</button>
-              </Link>
+              <div className="flex items-center justify-end">
+                <Link to={`/plan/${p.id}`} className="card-actions justify-end">
+                  <button className="btn">Show</button>
+                </Link>
+                <div className="w-2" />
+                <Link
+                  to={`/plan/${p.id}/edit`}
+                  className="card-actions justify-end"
+                >
+                  <button className="btn">Edit</button>
+                </Link>
+              </div>
             </div>
           </div>
         );
