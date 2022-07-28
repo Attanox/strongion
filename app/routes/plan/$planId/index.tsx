@@ -8,15 +8,13 @@ import {
 } from "@remix-run/node";
 import Layout from "components/Layout";
 import { getPlanAndPhases } from "server/plan.server";
-import { ClientOnly } from "remix-utils";
-import DragEditor from "components/DragEditor.client";
 import qs from "qs";
 import {
   addExercisesToPhase,
   getPhasesByPlan,
   removePhaseExercises,
 } from "server/phase.server";
-import PhaseOverview from "components/PhaseOverview";
+import PlanOverview from "components/PlanOverview";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof authenticateUser>>;
@@ -80,14 +78,7 @@ const PlanEditor = () => {
 
   return (
     <Layout user={user}>
-      {phases.map((phase) => {
-        return (
-          <React.Fragment key={phase.id}>
-            <PhaseOverview phase={phase} />
-            <div className="w-full h-8" />
-          </React.Fragment>
-        );
-      })}
+      <PlanOverview phases={phases} planTitle={plan.title} />
     </Layout>
   );
 };

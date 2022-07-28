@@ -17,6 +17,8 @@
     "bcrypt": "^5.0.1",
     "daisyui": "^2.19.0",
     "downshift": "^6.1.7",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.25",
     "qs": "^6.11.0",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",

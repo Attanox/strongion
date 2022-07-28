@@ -1,4 +1,3 @@
-import React from "react";
 import { type getPlanAndPhases } from "server/plan.server";
 
 type TPhase = Awaited<ReturnType<typeof getPlanAndPhases>>["phases"][0];
@@ -11,7 +10,7 @@ const PhaseOverview = (props: { phase: TPhase }) => {
       <h2 className="tracking-wide">{phase.title}</h2>
       <div className="h-4" />
       <div className="overflow-x-auto relative">
-        <table className="w-full text-sm text-left text-gray-400">
+        <table id={phase.id} className="w-full text-sm text-left text-gray-400">
           <thead className="text-xs uppercase bg-primary text-white">
             <tr>
               <th scope="col" className="py-3 px-6">
