@@ -37,6 +37,9 @@ model Phase {
   exercises   Exercise[]
   plan        Plan       @relation(references: [id], fields: [planId], onDelete: Cascade)
   planId      String     @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Exercise {
@@ -46,6 +49,9 @@ model Exercise {
   exerciseData ExerciseData
   phase        Phase        @relation(references: [id], fields: [phaseId], onDelete: Cascade)
   phaseId      String       @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 type ExerciseData {

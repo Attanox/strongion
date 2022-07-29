@@ -39,15 +39,20 @@ export async function getPlanAndPhases(id: string) {
   for (let index = 0; index < dbPhases.length; index++) {
     const phase = dbPhases[index];
 
-    const exercises = await prisma.phase
-      .findFirst({
-        where: {
-          id: phase.id,
+    const selected = await prisma.phase.findFirst({
+      where: {
+        id: phase.id,
+      },
+      select: {
+        exercises: {
+          orderBy: {
+            createdAt: "asc",
+          },
         },
-      })
-      .exercises();
+      },
+    });
 
-    phases.push({ ...phase, exercises });
+    phases.push({ ...phase, exercises: selected?.exercises || [] });
   }
 
   return { plan, phases };

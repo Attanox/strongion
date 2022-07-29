@@ -89,6 +89,72 @@ const getItemStyle = (
   ...draggableStyle,
 });
 
+const DropCol = (props: {
+  id: string;
+  draggables: DndExercise[];
+  onClick: (a: number) => void;
+  renderInputRow: (e: DndExercise, idx: number) => React.ReactNode;
+}) => {
+  const { draggables, id, onClick, renderInputRow } = props;
+
+  return (
+    <Droppable droppableId={id}>
+      {(provided, snapshot) => (
+        <div
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+          style={getListStyle()}
+          className={`bg-base-300`}
+        >
+          {draggables.map((exercise, index) => (
+            <Draggable
+              key={exercise.id}
+              draggableId={exercise.id}
+              index={index}
+            >
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  style={getItemStyle(provided.draggableProps.style)}
+                  className={`bg-base-100 w-full flex flex-col justify-center items-start`}
+                >
+                  <div className="w-full flex justify-between items-center">
+                    <span>{exercise.name}</span>
+                    <button
+                      onClick={() => onClick(index)}
+                      className="btn btn-square btn-sm btn-outline fill-primary"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="h-4" />
+                  {renderInputRow(exercise, index)}
+                </div>
+              )}
+            </Draggable>
+          ))}
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
+};
+
 const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
   const { phases: initialPhases } = props;
 
@@ -230,194 +296,84 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
           <DragDropContext onDragEnd={onDragEnd}>
             {phases.map((phase, idx) => {
               return (
-                <Droppable key={idx} droppableId={`${idx}`}>
-                  {(provided, snapshot) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      style={getListStyle()}
-                      className={`bg-primary`}
-                    >
-                      {phase.map((exercise, index) => (
-                        <Draggable
-                          key={exercise.id}
-                          draggableId={exercise.id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => {
-                            return (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={getItemStyle(
-                                  provided.draggableProps.style
-                                )}
-                                className={`w-full flex flex-col justify-center items-start bg-base-100`}
-                                key={`${exercise.info.sets}-${exercise.info.reps}`}
-                              >
-                                <div className="w-full flex justify-between items-center">
-                                  <span>{exercise.name}</span>
-                                  <button
-                                    onClick={() => removeExercise(idx, index)}
-                                    className="btn btn-square btn-sm btn-outline fill-primary"
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-3 w-3"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                      />
-                                    </svg>
-                                  </button>
-                                </div>
-                                <div className="h-4" />
-                                <input
-                                  name={`phase[${idx}][${exercise.id}][title]`}
-                                  defaultValue={exercise.name}
-                                  className="hidden"
-                                />
-                                <div className="flex items-center">
-                                  <input
-                                    name={`phase[${idx}][${exercise.id}][sets]`}
-                                    type="number"
-                                    defaultValue={exercise.info.sets}
-                                    onChange={(e) => {
-                                      const value = Number(e.target.value);
+                <DropCol
+                  key={idx}
+                  id={`${idx}`}
+                  renderInputRow={(exercise, index) => {
+                    return (
+                      <React.Fragment>
+                        <input
+                          name={`phase[${idx}][${exercise.id}][title]`}
+                          defaultValue={exercise.name}
+                          className="hidden"
+                        />
+                        <div className="flex items-center">
+                          <input
+                            name={`phase[${idx}][${exercise.id}][sets]`}
+                            type="number"
+                            defaultValue={exercise.info.sets}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
 
-                                      changeSetsAndReps(
-                                        value,
-                                        "sets",
-                                        idx,
-                                        index
-                                      );
-                                    }}
-                                    className="input input-bordered w-full h-8"
-                                  />
-                                  <span className="mx-4">X</span>
-                                  <input
-                                    name={`phase[${idx}][${exercise.id}][reps]`}
-                                    type="number"
-                                    defaultValue={exercise.info.reps}
-                                    onChange={(e) => {
-                                      const value = Number(e.target.value);
+                              changeSetsAndReps(value, "sets", idx, index);
+                            }}
+                            className="input input-bordered w-full h-8"
+                          />
+                          <span className="mx-4">X</span>
+                          <input
+                            name={`phase[${idx}][${exercise.id}][reps]`}
+                            type="number"
+                            defaultValue={exercise.info.reps}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
 
-                                      changeSetsAndReps(
-                                        value,
-                                        "reps",
-                                        idx,
-                                        index
-                                      );
-                                    }}
-                                    className="input input-bordered w-full h-8"
-                                  />
-                                </div>
-                              </div>
-                            );
-                          }}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                              changeSetsAndReps(value, "reps", idx, index);
+                            }}
+                            className="input input-bordered w-full h-8"
+                          />
+                        </div>
+                      </React.Fragment>
+                    );
+                  }}
+                  draggables={phase}
+                  onClick={(index) => removeExercise(idx, index)}
+                />
               );
             })}
-            <Droppable droppableId={`${phases.length}`}>
-              {(provided, snapshot) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  style={getListStyle()}
-                  className={`bg-primary`}
-                >
-                  {searchedExercises.map((exercise, index) => (
-                    <Draggable
-                      key={exercise.id}
-                      draggableId={exercise.id}
-                      index={index}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle(provided.draggableProps.style)}
-                          className={`w-full flex flex-col justify-center items-start bg-base-100`}
-                        >
-                          <div className="w-full flex justify-between items-center">
-                            <span>{exercise.name}</span>
-                            <button
-                              onClick={() => removeSearched(index)}
-                              className="btn btn-square btn-sm btn-outline fill-primary"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-3 w-3"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                          <div className="h-4" />
-                          <div className="flex items-center">
-                            <input
-                              name="sets"
-                              type="number"
-                              defaultValue={exercise.info.sets}
-                              onChange={(e) => {
-                                const value = Number(e.target.value);
+            <DropCol
+              draggables={searchedExercises}
+              id={`${phases.length}`}
+              onClick={(index) => removeSearched(index)}
+              renderInputRow={(exercise, index) => {
+                return (
+                  <div className="flex items-center">
+                    <input
+                      name="sets"
+                      type="number"
+                      defaultValue={exercise.info.sets}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
 
-                                changeSetsAndReps(
-                                  value,
-                                  "sets",
-                                  phases.length,
-                                  index
-                                );
-                              }}
-                              className="input input-bordered w-full h-8"
-                            />
-                            <span className="mx-4">X</span>
-                            <input
-                              name="reps"
-                              type="number"
-                              defaultValue={exercise.info.reps}
-                              onChange={(e) => {
-                                const value = Number(e.target.value);
+                        changeSetsAndReps(value, "sets", phases.length, index);
+                      }}
+                      className="input input-bordered w-full h-8"
+                    />
+                    <span className="mx-4">X</span>
+                    <input
+                      name="reps"
+                      type="number"
+                      defaultValue={exercise.info.reps}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
 
-                                changeSetsAndReps(
-                                  value,
-                                  "reps",
-                                  phases.length,
-                                  index
-                                );
-                              }}
-                              className="input input-bordered w-full h-8"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+                        changeSetsAndReps(value, "reps", phases.length, index);
+                      }}
+                      className="input input-bordered w-full h-8"
+                    />
+                  </div>
+                );
+              }}
+            />
           </DragDropContext>
         </div>
       </div>
