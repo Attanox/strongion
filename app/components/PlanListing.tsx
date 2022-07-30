@@ -4,10 +4,10 @@ import React from "react";
 
 const PlanListing = (props: { plans: Plan[] }) => {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 gap-4">
       {props.plans.map((p) => {
         return (
-          <div key={p.id} className="card w-96 bg-primary text-primary-content">
+          <div key={p.id} className="card bg-primary text-primary-content">
             <div className="card-body">
               <h2 className="card-title">{p.title}</h2>
               <p>{p.description}</p>

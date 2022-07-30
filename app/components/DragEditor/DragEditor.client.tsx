@@ -18,6 +18,8 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
     DndExercise[]
   >([]);
 
+  const inFocus = React.useRef<HTMLInputElement>();
+
   const changeSetsAndReps = (
     value: number,
     what: "sets" | "reps",
@@ -145,7 +147,10 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
         <div className="w-full h-4" />
 
         <div className="flex flex-row justify-between">
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext
+            onBeforeDragStart={() => inFocus.current?.blur()}
+            onDragEnd={onDragEnd}
+          >
             {phases.map((phase, idx) => {
               return (
                 <DropCol
@@ -170,6 +175,7 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
 
                               changeSetsAndReps(value, "sets", idx, index);
                             }}
+                            onFocus={(e) => (inFocus.current = e.target)}
                             className="input input-bordered w-full h-8"
                           />
                           <span className="mx-4">X</span>
@@ -182,6 +188,7 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
 
                               changeSetsAndReps(value, "reps", idx, index);
                             }}
+                            onFocus={(e) => (inFocus.current = e.target)}
                             className="input input-bordered w-full h-8"
                           />
                         </div>
@@ -210,6 +217,7 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
 
                         changeSetsAndReps(value, "sets", phases.length, index);
                       }}
+                      onFocus={(e) => (inFocus.current = e.target)}
                       className="input input-bordered w-full h-8"
                     />
                     <span className="mx-4">X</span>
@@ -222,6 +230,7 @@ const DragEditor = (props: { plan: Plan; phases: TPhases }) => {
 
                         changeSetsAndReps(value, "reps", phases.length, index);
                       }}
+                      onFocus={(e) => (inFocus.current = e.target)}
                       className="input input-bordered w-full h-8"
                     />
                   </div>

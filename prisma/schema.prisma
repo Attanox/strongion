@@ -32,7 +32,7 @@ model Plan {
 
 model Phase {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  title       String     @unique
+  title       String
   description String?
   exercises   Exercise[]
   plan        Plan       @relation(references: [id], fields: [planId], onDelete: Cascade)
@@ -55,6 +55,6 @@ model Exercise {
 }
 
 type ExerciseData {
-  reps   Int
-  sets   Int
+  reps Int
+  sets Int
 }

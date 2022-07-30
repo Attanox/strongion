@@ -41,15 +41,17 @@ export const action: ActionFunction = async ({ request, params }) => {
     const phase = phases[index];
     const phaseData = parsed.phase[index];
 
-    const data = Object.values(phaseData).map((d) => ({
+    const data = Object.values(phaseData || {}).map((d) => ({
       name: d.title,
       exerciseData: { reps: Number(d.reps), sets: Number(d.sets) },
       phaseId: phase.id,
     }));
 
     // * remove all, then add them back
-    await removePhaseExercises(phase.id);
-    await addExercisesToPhase(data);
+    if (data && data.length) {
+      await removePhaseExercises(phase.id);
+      await addExercisesToPhase(data);
+    }
   }
 
   return redirect("/");

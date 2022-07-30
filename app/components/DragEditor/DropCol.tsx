@@ -36,6 +36,7 @@ const DropCol = (props: {
                 >
                   <div className="w-full flex justify-between items-center">
                     <span>{exercise.name}</span>
+                    <div className="w-4" />
                     <button
                       onClick={() => onClick(index)}
                       className="btn btn-square btn-sm btn-outline fill-primary"
