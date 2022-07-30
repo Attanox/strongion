@@ -9,7 +9,7 @@ import {
 import Layout from "components/Layout";
 import { getPlanAndPhases } from "server/plan.server";
 import { ClientOnly } from "remix-utils";
-import DragEditor from "components/DragEditor.client";
+import DragEditor from "components/DragEditor/DragEditor.client";
 import qs from "qs";
 import {
   addExercisesToPhase,

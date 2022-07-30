@@ -57,6 +57,4 @@ model Exercise {
 type ExerciseData {
   reps   Int
   sets   Int
-  rest   Int?
-  weight Int?
 }

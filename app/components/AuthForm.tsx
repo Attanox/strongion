@@ -64,10 +64,7 @@ const AuthForm = (props: { formType: "register" | "login" }) => {
             </button>
           </Form>
           {data?.error && (
-            <div
-              className="alert alert-error shadow-lg w-full my-3"
-              role="alert"
-            >
+            <div className="alert alert-error shadow-lg w-96 my-3" role="alert">
               <svg
                 aria-hidden="true"
                 focusable="false"
