@@ -80,6 +80,7 @@ const AutoComplete = (props: {
       <input {...getInputProps()} className="input input-bordered w-full" />
       <ul
         {...getMenuProps()}
+        key={isOpen}
         className="absolute top-24 w-72 bg-white shadow-md max-h-80 overflow-y-auto"
       >
         {isOpen
