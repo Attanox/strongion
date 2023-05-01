@@ -20,6 +20,7 @@ const AuthForm = (props: { formType: "register" | "login" }) => {
                 <span className="label-text">Name</span>
               </label>
               <input
+                defaultValue={formType === "login" ? "Test" : ""}
                 id="name"
                 name="name"
                 type="text"
@@ -33,6 +34,7 @@ const AuthForm = (props: { formType: "register" | "login" }) => {
                 <span className="label-text">Password</span>
               </label>
               <input
+                defaultValue={formType === "login" ? "1234" : ""}
                 id="password"
                 name="password"
                 type="password"
